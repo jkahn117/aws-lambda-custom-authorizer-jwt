@@ -1,0 +1,22 @@
+{
+  "name": "aws-lambda-custom-authorizer-jwt",
+  "version": "0.0.1",
+  "description": "API Gateway Custom Authorizer to support JSON Web Token.",
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^2.0.0",
+    "jsonwebtoken": "^7.1.9"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-aws-lambda": "^0.13.0",
+    "grunt-contrib-coffee": "^1.0.0"
+  },
+  "scripts": {},
+  "author": "me",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jkahn117/aws-lambda-custom-authorizer-jwt.git"
+  }
+}

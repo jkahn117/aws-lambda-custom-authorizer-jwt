@@ -1,0 +1,7 @@
+node_modules/
+npm-debug.log
+dist/
+Gruntfile.coffee
+src/
+*.iml
+event.json

@@ -1,0 +1,5 @@
+{
+    "type" : "TOKEN",
+    "authorizationToken" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiam9zaCIsImlhdCI6MTQ3NjEyNjQwMX0.u2iU5VKz_r_zHu1Vqi4oLArnxzuNWuWU4UfWtPNus1c",
+    "methodArn" : "arn:aws:execute-api:us-west-2:487757292854:rd4x7xrp58/*/GET/sales"
+}

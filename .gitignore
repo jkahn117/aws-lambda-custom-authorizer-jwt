@@ -1,0 +1,6 @@
+dist/*
+node_modules/*
+index.js
+.DS_Store
+Gruntfile.coffee
+sample.js
