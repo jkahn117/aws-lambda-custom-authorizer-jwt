@@ -8,16 +8,6 @@
 require('dotenv').config()
 
 #
-# Enumeration of status codes for internal authorizer status.
-#
-AuthorizerStatus =
-  OK:             1  # authorized user, allow to service
-  FORBIDDEN:      2  # authorized user, deny to service
-  UNAUTHORIZED:   3  # not an authorized user
-  JWT_ERROR:      4  # error in decoding JSON Web Token
-  INTERNAL_ERROR: 5  # some other server error
-
-#
 # Regular expression to extract JWT token from Authorization header.
 #
 BEARER_TOKEN_PATTERN = /^Bearer\s+([^\s]+)\s*$/i;
@@ -29,20 +19,19 @@ BEARER_TOKEN_PATTERN = /^Bearer\s+([^\s]+)\s*$/i;
 #
 exports.handler = (event, context) ->
   token  = BEARER_TOKEN_PATTERN.exec(event.authorizationToken)[1]
-  resource = extractResource(event.methodArn)
 
   authorizer = new JWTAuthorizer(token)
-  authorizer.isAuthorizedFor resource, (principalId, status, error) =>
+  authorizer.isAuthorizedFor event.methodArn, (principalId, status, error) =>
     switch status
       # Authenticated and authorized to access method
       when AuthorizerStatus.OK
-        console.log("OK response for #{principalId} : #{resource}")
+        console.log("OK response for #{principalId} : #{event.methodArn}")
         policy = new SimplePolicy(principalId, event.methodArn, 'Allow')
         context.succeed policy.build()
 
       # Authenticated but not authorized to access method
       when AuthorizerStatus.FORBIDDEN
-        console.log("FORBIDDEN response for #{principalId} : #{resource}")
+        console.log("FORBIDDEN response for #{principalId} : #{event.methodArn}")
         policy = new SimplePolicy(principalId, event.methodArn, 'Deny')
         context.succeed policy.build()
 
@@ -53,11 +42,6 @@ exports.handler = (event, context) ->
 
       # Error occurred in processing or JWT verification
       else
-        console.log("ERROR response")
+        console.log("[ERROR] #{error}")
         context.fail("Internal Server Error")
 
-
-extractResource = (methodArn) ->
-  arnElements = methodArn.split(':', 6)
-  resourceElements = arnElements[5].split('/', 4)
-  return "#{resourceElements[2]}/#{resourceElements[3]}"

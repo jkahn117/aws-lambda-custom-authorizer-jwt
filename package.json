@@ -4,6 +4,7 @@
   "description": "API Gateway Custom Authorizer to support JSON Web Token.",
   "main": "index.js",
   "dependencies": {
+    "aws-sdk": "^2.6.10",
     "dotenv": "^2.0.0",
     "jsonwebtoken": "^7.1.9"
   },
