@@ -67,16 +67,49 @@ class AbstractAuthorizer
     ddb = new AWS.DynamoDB { apiVersion: '2012-08-10' }
     ddb.getItem params, (error, data) =>
       if error
+        console.log "[ERROR] Get authorization item: \(error.message)"
         callback(principalId, AuthorizerStatus.INTERNAL_ERROR, error.message)
       else
         if data.Item && data.Item.httpMethod
           allowedMethod = data.Item.httpMethod.S
           if allowedMethod == '*' || allowedMethod == @_extractMethod(resource)
-            callback(principalId, AuthorizerStatus.OK, null)
+            @_updateLastAccessTime(principalId, resource, callback)
           else
             callback(principalId, AuthorizerStatus.FORBIDDEN, null)
         else
           callback(principalId, AuthorizerStatus.UNAUTHORIZED, null)
+
+  #
+  # Update last access time attributed in DynamoDB table for the
+  # authorization item. (Private)
+  #
+  # @param {String} principalId: identifier for user
+  # @param {String} resource: ARN for resource to access
+  # @param {Function} callback(principalId, AuthorizerStatus, error)
+  #
+  _updateLastAccessTime:(principalId, resource, callback) ->
+    params =
+      Key:
+        resource:
+          S: @_extractResource(resource)
+        username:
+          S: principalId
+      TableName: process.env.TABLE_NAME
+      UpdateExpression: 'SET #lastAccess =:l'
+      ExpressionAttributeNames:
+        '#lastAccess': 'lastAccess'
+      ExpressionAttributeValues:
+        ':l':
+          S: (new Date()).toJSON()
+      ReturnValues: 'UPDATED_NEW'
+
+    ddb = new AWS.DynamoDB { apiVersion: '2012-08-10' }
+    ddb.updateItem params, (error, data) ->
+      if error
+        console.log "[ERROR] Update last access error: #{error.message}"
+
+      # wait for last time stamp update, not ideal...
+      callback(principalId, AuthorizerStatus.OK, null)
 
   #
   # Extracts the resource identifier (API id + stage) from the passed ARN.
