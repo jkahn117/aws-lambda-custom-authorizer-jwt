@@ -61,7 +61,7 @@ class AbstractAuthorizer
           S: @_extractResource(resource)
         username:
           S: principalId
-      TableName: 'Authorization'
+      TableName: process.env.TABLE_NAME
       ProjectionExpression: 'httpMethod'
 
     ddb = new AWS.DynamoDB { apiVersion: '2012-08-10' }
